@@ -114,3 +114,50 @@ h3 {
 .main .block-container {
     padding-bottom: 80px;
 }
+
+/* ----------------------------------------- */
+/* 📱 Mobile responsiveness + editor tweaks  */
+/* ----------------------------------------- */
+
+@media (max-width: 768px) {
+    body {
+        padding: 0 8px;
+        font-size: 14px;
+    }
+
+    .stButton button {
+        width: 100%;
+        padding: 10px 0;
+        font-size: 15px;
+    }
+
+    .stSelectbox select {
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .stTextArea textarea {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    /* Make the ACE editor easier to tap and paste into on mobile */
+    .ace_editor {
+        font-size: 13px !important;
+        min-height: 220px !important;
+        width: 100% !important;
+    }
+
+    /* Avoid the fixed footer covering input fields on small screens */
+    .app-footer {
+        position: static !important;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .main .block-container {
+        padding-bottom: 24px;
+        padding-left: 4px;
+        padding-right: 4px;
+    }
+}

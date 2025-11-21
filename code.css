@@ -148,16 +148,16 @@ h3 {
         width: 100% !important;
     }
 
-    /* Avoid the fixed footer covering input fields on small screens */
-    .app-footer {
-        position: static !important;
-        padding-top: 12px;
-        padding-bottom: 12px;
-    }
-
     .main .block-container {
         padding-bottom: 24px;
         padding-left: 4px;
         padding-right: 4px;
     }
+}
+
+/* Hide ACE editor settings / three-dots menu so the top-right icon
+   inside the code box is not visible on any device */
+.ace_editor [class*="ace_settings"],
+.ace_editor .ace_button {
+    display: none !important;
 }

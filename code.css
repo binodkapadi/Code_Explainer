@@ -1,0 +1,116 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d1117;
+    /* clean dark background */
+    color: #e6e6e6;
+}
+
+h1,
+h2,
+h3 {
+    color: #58a6ff;
+}
+
+.stTextArea textarea {
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    background-color: #161b22;
+    color: #f8f8f2;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #30363d;
+}
+
+.stSelectbox select {
+    font-size: 14px;
+    border-radius: 6px;
+    padding: 5px;
+    border: 1px solid #444;
+    background-color: #1c2128;
+    color: #e6e6e6;
+}
+
+.stButton button {
+    background-color: #238636;
+    color: #fff;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.stButton button:hover {
+    background-color: #2ea043;
+}
+
+.code-line {
+    background-color: #1f242d;
+    color: #f8f8f2;
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 5px;
+    margin: 4px 0;
+    border-left: 3px solid #58a6ff;
+}
+
+.explanation {
+    background-color: #f7f7f7;
+    color: #333;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-left: 4px solid #238636;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.error-box {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 12px;
+    border-left: 4px solid #ff4d4d;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    font-family: 'Fira Code', monospace;
+}
+
+.error-highlight {
+    color: #ff4d4d;
+    font-weight: bold;
+    background: rgba(255, 0, 0, 0.1);
+    padding: 3px 6px;
+    border-radius: 5px;
+}
+
+/* Footer styling pinned to the bottom */
+.app-footer {
+    position: fixed !important;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    /* match overall dark theme background, but with a subtle top border */
+    background: #0d1117;
+    border-top: 1px solid #30363d;
+    color: #e6e6e6;
+    text-align: center;
+    padding: 8px 0 10px;
+    box-shadow: none;
+    z-index: 9999;
+}
+
+.footer-text {
+    margin: 0;
+    font-size: 14px;
+}
+
+.footer-name {
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+/* Add a little bottom padding so content doesn't sit under the footer */
+.main .block-container {
+    padding-bottom: 80px;
+}

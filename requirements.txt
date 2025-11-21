@@ -1,0 +1,7 @@
+streamlit
+python-dotenv
+fastapi
+google-generativeai
+requests
+pygments
+streamlit-ace

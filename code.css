@@ -144,7 +144,7 @@ h3 {
     /* Make the ACE editor easier to tap and paste into on mobile */
     .ace_editor {
         font-size: 13px !important;
-        min-height: 220px !important;
+        min-height: 320px !important; /* taller box so copy/paste bar is less cramped */
         width: 100% !important;
     }
 

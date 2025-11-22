@@ -136,11 +136,6 @@ h3 {
         font-size: 14px;
     }
 
-    .stTextArea textarea {
-        width: 100%;
-        font-size: 13px;
-    }
-
     /* Make the ACE editor easier to tap and paste into on mobile */
     .ace_editor {
         font-size: 13px !important;

@@ -677,17 +677,32 @@ def main():
     render_footer()
 
     st.markdown("**📝 Paste your code here:**")
-    code = st_ace(
+
+    # Desktop-friendly editor with line numbers (Ace).
+    ace_code = st_ace(
         placeholder="Write or paste your code here...",
         language="text",
-        theme="tomorrow_night_bright",  
+        theme="tomorrow_night_bright",
         key="code_editor",
         height=300,
-        show_gutter=True,           
+        show_gutter=True,
         show_print_margin=False,
         wrap=True,
-        auto_update=True,           
+        auto_update=True,
     ) or ""
+
+    # Mobile-friendly plain text area that uses the browser's native
+    # paste / select-all behavior (more reliable on phones).
+    simple_code = st.text_area(
+        "📱 Or paste here (better on mobile):",
+        value="",
+        height=220,
+        key="code_editor_mobile",
+    )
+
+    # Prefer whatever the user actually used: if the mobile box has
+    # content, use that; otherwise fall back to the Ace editor.
+    code = (simple_code or "").strip("\n") or ace_code
 
     # Side‑by‑side selectors: language (left) and Gemini model (right).
     col_lang, col_model = st.columns(2)

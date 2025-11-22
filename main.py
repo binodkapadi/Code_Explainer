@@ -678,8 +678,11 @@ def main():
 
     st.markdown("**📝 Paste your code here:**")
 
-    # Desktop-friendly editor with line numbers (Ace).
-    ace_code = st_ace(
+    # Single Ace editor with line numbers. On some mobiles the cursor may
+    # land on line 2 when pasting, so we normalize leading blank lines
+    # in Python before analysis so that the *logical* first line of code
+    # is always line 1.
+    raw_code = st_ace(
         placeholder="Write or paste your code here...",
         language="text",
         theme="tomorrow_night_bright",
@@ -690,19 +693,12 @@ def main():
         wrap=True,
         auto_update=True,
     ) or ""
-
-    # Mobile-friendly plain text area that uses the browser's native
-    # paste / select-all behavior (more reliable on phones).
-    simple_code = st.text_area(
-        "📱 Or paste here (better on mobile):",
-        value="",
-        height=220,
-        key="code_editor_mobile",
-    )
-
-    # Prefer whatever the user actually used: if the mobile box has
-    # content, use that; otherwise fall back to the Ace editor.
-    code = (simple_code or "").strip("\n") or ace_code
+    # Strip leading completely empty lines so pasted code effectively
+    # starts from the first visible line.
+    lines = raw_code.splitlines()
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    code = "\n".join(lines)
 
     # Side‑by‑side selectors: language (left) and Gemini model (right).
     col_lang, col_model = st.columns(2)

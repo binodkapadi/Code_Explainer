@@ -25,6 +25,14 @@ SUPPORTED_LANGUAGES = {
     "assembly": "Assembly",
 }
 
+# Human‑friendly Gemini model names mapped to actual API model IDs.
+GEMINI_MODELS = {
+    "Gemini 2.0 Flash": "gemini-2.0-flash",
+    "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
+    "Gemini 2.5 Pro": "gemini-2.5-pro",
+    "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
+}
+
 
 # Normalization map so every detector (rules, Pygments, Gemini, dropdown)
 # is converted to a single canonical key from SUPPORTED_LANGUAGES.
@@ -473,7 +481,7 @@ def structural_check_and_fix(code):
 # 🌟 AI ERROR DETECTION (updated to use structural checker)
 # -------------------------------------------------------
 
-def detect_errors(code, language):
+def detect_errors(code, language, model_name="gemini-2.0-flash"):
     """
     Analyze the entire code snippet and generate a single error report that
     includes only **meaningful errors**:
@@ -591,7 +599,7 @@ one of the numbers shown on the left below:
 {numbered_code}
 """
 
-    resp = safe_gemini_call(prompt)
+    resp = safe_gemini_call(prompt, model_name=model_name)
     return resp
 
 
@@ -600,7 +608,7 @@ one of the numbers shown on the left below:
 # 🌟 EXPLAIN CODE (ONLY IF NO ERRORS)
 # -------------------------------------------------------
 
-def explain_code(code_content, language):
+def explain_code(code_content, language, model_name="gemini-2.0-flash"):
     lang_key = normalize_language_name(str(language))
     lang_label = "x86 Assembly" if lang_key == "assembly" else language
 
@@ -627,7 +635,7 @@ Code:
 {code_content}
 """
 
-    return safe_gemini_call(prompt)
+    return safe_gemini_call(prompt, model_name=model_name)
 
 
 # -------------------------------------------------------
@@ -681,7 +689,20 @@ def main():
         auto_update=True,           
     ) or ""
 
-    selected_lang = st.selectbox("🖥️ Select programming language:", list(SUPPORTED_LANGUAGES.values()))
+    # Side‑by‑side selectors: language (left) and Gemini model (right).
+    col_lang, col_model = st.columns(2)
+    with col_lang:
+        selected_lang = st.selectbox(
+            "🖥️ Select programming language:",
+            list(SUPPORTED_LANGUAGES.values()),
+        )
+    with col_model:
+        selected_model_label = st.selectbox(
+            "🤖 Choose Gemini model:",
+            list(GEMINI_MODELS.keys()),
+            index=0,
+        )
+    selected_model_name = GEMINI_MODELS[selected_model_label]
 
     if st.button("🚀 Explain Code"):
 
@@ -708,7 +729,7 @@ def main():
 
         st.info("🔍 Checking for errors…")
 
-        error_data = detect_errors(code, selected_lang)
+        error_data = detect_errors(code, selected_lang, model_name=selected_model_name)
 
         if "__API_ERROR__" in error_data:
             st.error("🚨 Gemini API limit exceeded. Please try again later.")
@@ -757,7 +778,7 @@ def main():
 
         st.success("✅ No errors found! Generating explanation…")
 
-        explanation = explain_code(code, selected_lang)
+        explanation = explain_code(code, selected_lang, model_name=selected_model_name)
 
         if "__API_ERROR__" in explanation:
             st.error("🚨 Gemini API limit exceeded. Try again later.")

@@ -295,7 +295,6 @@ def detect_language(code_text: str) -> str:
             [
                 "end;",
                 "end %",
-                "%",  # line comment
                 "plot(",
                 "function ",
             ],
@@ -548,7 +547,41 @@ def detect_errors(code, language, model_name="gemini-2.0-flash"):
     # handle empty snippet gracefully
     numbered_code = "\n".join(numbered_lines) if numbered_lines else "1:"
 
-    prompt = f"""
+    # Assembly is treated extra‑conservatively: only assembler‑level syntax
+    # issues that would make the snippet fail to assemble are considered
+    # errors. We do NOT try to guess logic/semantic problems for Assembly.
+    if lang_key == "assembly":
+        prompt = f"""
+You are a coding assistant. Carefully analyze the following x86 Assembly code
+and find **only REAL assembler-level syntax errors** that would make it fail
+to assemble. DO NOT try to guess logic or performance problems.
+
+{asm_extra}{struct_hint}If ANY real syntax errors exist → ALWAYS use THIS FORMAT (each error on its own lines exactly as below),
+and include **every** syntax error you can find in this single report:
+Error in Line <number>:
+<describe error>
+
+Error in Line <number>:
+<describe error>
+
+(Corrected code must come AFTER all error lines)
+
+Corrected Code:
+<corrected full version of the code with ALL syntax errors fixed>
+
+If there are absolutely NO syntax errors in the code, reply with EXACTLY this sentence
+and nothing else:
+No errors found
+
+Here is the code with line numbers on the left. These line numbers are the ONLY
+line numbers you should use. Do NOT renumber the code, do NOT skip blank lines,
+and do NOT invent your own numbering. When you say "Error in Line N", N MUST be
+one of the numbers shown on the left below:
+
+{numbered_code}
+"""
+    else:
+        prompt = f"""
 You are a coding assistant. Carefully analyze the entire {lang_label} code below
 and find **all REAL errors** in the whole snippet that make the program
 incorrect or impossible to compile/run.
@@ -639,6 +672,34 @@ Code:
 
 
 # -------------------------------------------------------
+# 🌟 HELPER: RENDER EXPLANATION BLOCK
+# -------------------------------------------------------
+
+
+def render_explanation_block(code, language, model_name, message="✅ No errors found! Generating explanation…"):
+    """Run the explainer and render line‑by‑line output in a consistent way."""
+    st.success(message)
+
+    explanation = explain_code(code, language, model_name=model_name)
+
+    if "__API_ERROR__" in explanation:
+        st.error("🚨 Gemini API limit exceeded. Try again later.")
+        return
+
+    pattern = r"Line:\s*(.*?)\s*Explanation:\s*(.*?)(?=Line:|$)"
+    matches = re.findall(pattern, explanation, re.DOTALL)
+
+    if not matches:
+        st.code(explanation)
+        return
+
+    for line, exp in matches:
+        st.markdown(f"<div class='code-line'>{line.strip()}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='explanation'>💡 {exp.strip()}</div>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+
+# -------------------------------------------------------
 # 🌟 FOOTER
 # -------------------------------------------------------
 
@@ -683,6 +744,8 @@ def main():
     # normalized content back into the editor on rerun.
     if "code_text" not in st.session_state:
         st.session_state["code_text"] = ""
+    if "last_corrected_code" not in st.session_state:
+        st.session_state["last_corrected_code"] = ""
 
     # Single Ace editor with line numbers.
     raw_code = st_ace(
@@ -741,6 +804,21 @@ def main():
             )
             return
 
+        # If the user pasted the exact same code we previously showed as the
+        # "Corrected Code", skip error detection entirely and go straight to
+        # explanation. Corrected versions are assumed to be valid.
+        if (
+            st.session_state.get("last_corrected_code", "").strip()
+            and code.strip() == st.session_state["last_corrected_code"].strip()
+        ):
+            render_explanation_block(
+                code,
+                selected_lang,
+                selected_model_name,
+                message="✅ Corrected code detected. Generating line‑by‑line explanation…",
+            )
+            return
+
         # ---------------------------------------------------
         # STEP 1 — CHECK ERRORS
         # ---------------------------------------------------
@@ -755,11 +833,24 @@ def main():
             return
 
         lower_err = error_data.lower()
-        no_error_pattern = bool(re.search(r"\bno[_ ]?error(s)?\b", lower_err) or
-                                "no errors found" in lower_err or
-                                "no error found" in lower_err)
+        no_error_pattern = bool(
+            re.search(r"\bno[_ ]?error(s)?\b", lower_err)
+            or "no errors found" in lower_err
+            or "no error found" in lower_err
+        )
 
-        if not no_error_pattern:
+        # We only trust a response as an "error report" if it follows the
+        # strict format we asked for (one or more `Error in Line N:` lines
+        # AND a `Corrected Code:` block). Any other text – even if it talks
+        # about problems – is treated as "no errors", so that correct or
+        # already‑corrected code does not get blocked from explanation.
+        has_error_lines = bool(re.search(r"Error in Line \d+:", error_data))
+        has_corrected_block = bool(
+            re.search(r"Corrected Code:\s*", error_data, flags=re.IGNORECASE)
+        )
+        has_structured_errors = has_error_lines and has_corrected_block
+
+        if not no_error_pattern and has_structured_errors:
             st.error("❌ Errors found in your code:")
 
             cleaned = error_data
@@ -787,6 +878,10 @@ def main():
             if corrected_block:
                 st.markdown("**Corrected Code:**")
                 st.code(corrected_block)
+                # Remember this corrected version so that if the user pastes it
+                # into the editor later, we explain it directly with no new
+                # error detection pass.
+                st.session_state["last_corrected_code"] = corrected_block
 
             return
 
@@ -794,26 +889,12 @@ def main():
         # STEP 2 — EXPLAIN ONLY IF NO ERRORS
         # ---------------------------------------------------
 
-        st.success("✅ No errors found! Generating explanation…")
-
-        explanation = explain_code(code, selected_lang, model_name=selected_model_name)
-
-        if "__API_ERROR__" in explanation:
-            st.error("🚨 Gemini API limit exceeded. Try again later.")
-            return
-
-        pattern = r"Line:\s*(.*?)\s*Explanation:\s*(.*?)(?=Line:|$)"
-        matches = re.findall(pattern, explanation, re.DOTALL)
-
-        if not matches:
-            st.code(explanation)
-            return
-
-        # show parsed line-by-line explanation
-        for line, exp in matches:
-            st.markdown(f"<div class='code-line'>{line.strip()}</div>", unsafe_allow_html=True)
-            st.markdown(f"<div class='explanation'>💡 {exp.strip()}</div>", unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+        render_explanation_block(
+            code,
+            selected_lang,
+            selected_model_name,
+            message="✅ No errors found! Generating explanation…",
+        )
 
 
 if __name__ == "__main__":

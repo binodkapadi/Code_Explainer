@@ -141,6 +141,7 @@ h3 {
         font-size: 13px !important;
         min-height: 320px !important; /* taller box so copy/paste bar is less cramped */
         width: 100% !important;
+        line-height: 1.6 !important;  /* a bit more vertical space for selection bar */
     }
 
     .main .block-container {

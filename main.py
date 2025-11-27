@@ -678,11 +678,15 @@ def main():
 
     st.markdown("**📝 Paste your code here:**")
 
-    # Single Ace editor with line numbers. On some mobiles the cursor may
-    # land on line 2 when pasting, so we normalize leading blank lines
-    # in Python before analysis so that the *logical* first line of code
-    # is always line 1.
+    # Keep code in session_state so we can normalize it (e.g. strip
+    # leading blank lines from mobile pastes) and also reflect that
+    # normalized content back into the editor on rerun.
+    if "code_text" not in st.session_state:
+        st.session_state["code_text"] = ""
+
+    # Single Ace editor with line numbers.
     raw_code = st_ace(
+        value=st.session_state["code_text"],
         placeholder="Write or paste your code here...",
         language="text",
         theme="tomorrow_night_bright",
@@ -693,12 +697,15 @@ def main():
         wrap=True,
         auto_update=True,
     ) or ""
+
     # Strip leading completely empty lines so pasted code effectively
-    # starts from the first visible line.
+    # starts from the first visible line, and store it back so the
+    # editor UI also shows line 1 filled instead of a blank first row.
     lines = raw_code.splitlines()
     while lines and not lines[0].strip():
         lines.pop(0)
     code = "\n".join(lines)
+    st.session_state["code_text"] = code
 
     # Side‑by‑side selectors: language (left) and Gemini model (right).
     col_lang, col_model = st.columns(2)

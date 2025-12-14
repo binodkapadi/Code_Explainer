@@ -28,9 +28,9 @@ SUPPORTED_LANGUAGES = {
 # Human‑friendly Gemini model names mapped to actual API model IDs.
 GEMINI_MODELS = {
     "Gemini Flash Latest": "gemini-flash-latest",
-    "gemini-2.5-flash-lite-preview-09-2025": "Gemini 2.5 Flash-Lite Preview",
+    "Gemini 2.5 Flash-Lite Preview": "gemini-2.5-flash-lite-preview-09-2025",
     "Gemini 2.5 Flash": "gemini-2.5-flash",
-    "gemini-flash-lite-latest": "Gemini Flash-Lite Latest",
+    "Gemini Flash-Lite Latest": "gemini-flash-lite-latest",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
 }
 
@@ -816,7 +816,7 @@ def main():
                 code,
                 selected_lang,
                 selected_model_name,
-                message="✅ Corrected code detected. Generating line-by-line explanation…",
+                message="✅ Corrected code detected. Generating line-byline explanation…",
             )
             return
 

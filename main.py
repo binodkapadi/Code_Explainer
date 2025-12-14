@@ -6,7 +6,7 @@ import google.generativeai as genai
 from pygments.lexers import guess_lexer
 from pygments.util import ClassNotFound
 import re
-import html  # used for safe escaping if needed
+import html  
 from streamlit_ace import st_ace
 
 load_dotenv()
@@ -27,9 +27,10 @@ SUPPORTED_LANGUAGES = {
 
 # Human‑friendly Gemini model names mapped to actual API model IDs.
 GEMINI_MODELS = {
-    "Gemini 2.0 Flash": "gemini-2.0-flash",
-    "Gemini 2.0 Flash-Lite": "gemini-2.0-flash-lite",
-    "Gemini 2.5 Pro": "gemini-2.5-pro",
+    "Gemini Flash Latest": "gemini-flash-latest",
+    "gemini-2.5-flash-lite-preview-09-2025": "Gemini 2.5 Flash-Lite Preview",
+    "Gemini 2.5 Flash": "gemini-2.5-flash",
+    "gemini-flash-lite-latest": "Gemini Flash-Lite Latest",
     "Gemini 2.5 Flash-Lite": "gemini-2.5-flash-lite",
 }
 
@@ -49,7 +50,7 @@ LANG_ALIASES = {
     "rb": "ruby", "ruby": "ruby",
     "swift": "swift",
     "kt": "kotlin", "kotlin": "kotlin",
-    "r": "r", "r language": "r", "s": "r",  # Pygments may label R as "S"
+    "r": "r", "r language": "r", "s": "r", 
     "sql": "sql",
     "html": "html", "htm": "html",
     "css": "css",
@@ -89,7 +90,7 @@ def normalize_language_name(name: str) -> str:
 # 🌟 SAFE GEMINI CALL (Prevents Crashes on API 429)
 # -------------------------------------------------------
 
-def safe_gemini_call(prompt, model_name="gemini-2.0-flash"):
+def safe_gemini_call(prompt, model_name="gemini-flash-latest"):
     try:
         model = genai.GenerativeModel(model_name)
         resp = model.generate_content(prompt)
@@ -480,21 +481,21 @@ def structural_check_and_fix(code):
 # 🌟 AI ERROR DETECTION (updated to use structural checker)
 # -------------------------------------------------------
 
-def detect_errors(code, language, model_name="gemini-2.0-flash"):
+def detect_errors(code, language, model_name="gemini-flash-latest"):
     """
     Analyze the entire code snippet and generate a single error report that
     includes only **meaningful errors**:
     - Syntax / parsing errors
     - Type / compilation errors (anything that would stop the compiler)
     - Runtime exceptions (clearly impossible or very likely in normal use,
-      for example guaranteed division by zero, always‑out‑of‑bounds index,
+      for example guaranteed division by zero, always-out-of-bounds index,
       dereferencing a null pointer, etc.)
     - Semantic / logical errors where the code definitely produces the wrong
-      result (wrong variable, off‑by‑one in a simple loop, obviously wrong
+      result (wrong variable, off-by-one in a simple loop, obviously wrong
       condition, etc.).
 
     Pure style issues (like missing final newlines, choice of variable names,
-    or formatting), micro‑optimizations, and speculative logic concerns that
+    or formatting), micro-optimizations, and speculative logic concerns that
     might still be correct SHOULD NOT be reported as errors.
 
     We run a fast local structural check (braces, parens, brackets, quotes,
@@ -502,7 +503,7 @@ def detect_errors(code, language, model_name="gemini-2.0-flash"):
     the final error list + corrected code always comes from a single Gemini
     call so it can fix *all* issues in one corrected version.
     """
-    # 1) local structural check over the whole code (used as hints only)
+    # local structural check over the whole code (used as hints only)
     struct_errors, _ = structural_check_and_fix(code)
     struct_hint = ""
     if struct_errors:
@@ -594,7 +595,7 @@ ONLY treat the following as errors:
   such as:
   - Using the wrong variable in an expression, comparison or assignment
   - A loop that obviously never executes when it should
-  - Off‑by‑one mistakes in simple index loops (e.g. iterating 0..n but accessing a[n])
+  - Off-by-one mistakes in simple index loops (e.g. iterating 0..n but accessing a[n])
   - A condition that is always false or always true given the nearby code
 
 DO NOT treat the following as errors:
@@ -602,7 +603,7 @@ DO NOT treat the following as errors:
   at the end of strings or at the end of the file)
 - Performance / optimization suggestions
 - Possible or hypothetical logic bugs where the program could still be correct
-- Missing comments, edge‑case checks, or input validation
+- Missing comments, edge-case checks, or input validation
 
 If you are not **certain** that something is truly an error of these kinds,
 ASSUME THE CODE IS CORRECT and do not report it.
@@ -641,7 +642,7 @@ one of the numbers shown on the left below:
 # 🌟 EXPLAIN CODE (ONLY IF NO ERRORS)
 # -------------------------------------------------------
 
-def explain_code(code_content, language, model_name="gemini-2.0-flash"):
+def explain_code(code_content, language, model_name="gemini-flash-latest"):
     lang_key = normalize_language_name(str(language))
     lang_label = "x86 Assembly" if lang_key == "assembly" else language
 
@@ -677,7 +678,7 @@ Code:
 
 
 def render_explanation_block(code, language, model_name, message="✅ No errors found! Generating explanation…"):
-    """Run the explainer and render line‑by‑line output in a consistent way."""
+    """Run the explainer and render line-by-line output in a consistent way."""
     st.success(message)
 
     explanation = explain_code(code, language, model_name=model_name)
@@ -815,7 +816,7 @@ def main():
                 code,
                 selected_lang,
                 selected_model_name,
-                message="✅ Corrected code detected. Generating line‑by‑line explanation…",
+                message="✅ Corrected code detected. Generating line-by-line explanation…",
             )
             return
 

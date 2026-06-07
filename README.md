@@ -1,13 +1,99 @@
-## Deployment Link
-
-url = https://binodkapadi-codeexplainer09.streamlit.app/
-
-       https://binodkapadi-codeexplainer09.streamlit.app/
-
-
-## CodeExplainer
+# CodeExplainer
 CodeExplainer analyzes any pasted code, detects syntax errors, logical bugs, runtime issues, and null-pointer risks. It shows the exact line number of each error, explains how to fix it, and provides a corrected version of the code.
 If no errors are found, it gives a simple, line-by-line explanation of how the code works.
+
+# Deployment Link
+
+Deployment (Streamlit) = https://binodkapadi-codeexplainer09.streamlit.app
+
+# PROJECT SETUP
+pip = Python Package Installer
+
+venv = Python Virtual Environment
+
+### Step 1: Install Required Software
+
+#### A) Install Python
+
+Download and install Python:
+
+Official Website: https://www.python.org/downloads/
+
+During installation:
+
+Check the option "Add Python to PATH"
+Click Install Now
+
+Verify installation [Open Command Prompt in Windows]:
+
+     python --version
+
+#### B) Install Visual Studio Code (Recommended)
+
+Download and install Visual Studio Code:
+
+Official Website: https://code.visualstudio.com
+
+Recommended Extensions:
+
+     Python
+     Pylance
+     Streamlit
+
+### Step 2: Setup Folder Structure
+
+Open VS Code Terminal and create a new folder:
+
+     mkdir CodeExplainer
+     cd CodeExplainer
+     python -m venv venv
+     venv\Scripts\activate
+
+First of all, inside the folder create:
+
+* .env
+* requirements.txt
+
+#### Install Dependencies
+
+First put all required dependencies inside requirements.txt file and then run:
+
+    pip install -r requirements.txt
+
+Or install manually if needed:
+
+      pip install streamlit google-generativeai python-dotenv
+
+#### Configure Environment Variables (.env)
+
+     GEMINI_API_KEY=your_gemini_api_key
+
+
+Get Gemini API Key from: https://aistudio.google.com/app/apikey
+
+### Step 3: Run the Streamlit Application
+
+#### Run the application:
+
+      streamlit run main.py
+
+By default, the app runs on:
+
+      http://localhost:8501
+
+#### STOP APPLICATION
+
+To stop the Streamlit server:
+
+      CTRL + C
+
+#### DEACTIVATE VIRTUAL ENVIRONMENT
+
+After completing your work:
+
+      deactivate
+
+
 
 ## Problem Statement
 Students and developers frequently face confusing errors in their code, including syntax issues, logical bugs, and unexpected crashes. Debugging manually is time-consuming and difficult, especially for beginners who cannot identify the exact cause or line where the problem exists.
@@ -36,59 +122,6 @@ CODEEXPLAINER
     - .gitignore                    # For hiding api key ( or other sensitive information)
     -  venv/                        # Virtual environment directory 
 
-
-
-## Setup Instructions (with Python)
-
-1. Create and Activate a Virtual Environment
-   
-       python -m venv venv
-       venv\Scripts\activate
-
-3. Install Dependencies
-   
-       pip install -r requirements.txt
-
-Or (If Needed)
-
-       pip install streamlit   
-
-
-5. Set Up Environment Variables
-   
-       GEMINI_API_KEY=your_google_gemini_api_key_here
-   
-7. Run the Streamlit App
-   
-       streamlit run mainapp.py
-
-   By default, the app runs on:
-   
-        http://localhost:8501
-
-  
-11. To stop the Streamlit App
-    
-        ctrl + c
-
-13. Deactivate the Virtual Environment (After Use)
-    
-        deactivate
-
-
-## Deployment
-   -Activate the virtual environment
-   
-        venv\Scripts\activate
-   
-   - Run the Streamlit App
-     
-         streamlit run mainapp.py
-
-   By default, the app runs on:
-   
-        http://localhost:8501
-        
 ## Features
 - Error Detection => Identifies syntax errors, logical bugs, runtime issues, and null-pointer risks in any programming language code.
 - Exact Line Highlighting => Shows the precise line numbers where errors occur.

@@ -1,7 +1,7 @@
 streamlit
 python-dotenv
 fastapi
-google-generativeai
+google-genai
 requests
 pygments
 streamlit-ace

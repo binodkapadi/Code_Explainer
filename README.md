@@ -60,10 +60,6 @@ First put all required dependencies inside requirements.txt file and then run:
 
     pip install -r requirements.txt
 
-Or install manually if needed:
-
-      pip install streamlit google-generativeai python-dotenv
-
 #### Configure Environment Variables (.env)
 
      GEMINI_API_KEY=your_gemini_api_key

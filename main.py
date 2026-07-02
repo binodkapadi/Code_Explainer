@@ -1,7 +1,8 @@
 import streamlit as st
 import os
+import logging
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 
 from pygments.lexers import guess_lexer
 from pygments.util import ClassNotFound
@@ -9,8 +10,11 @@ import re
 import html  
 from streamlit_ace import st_ace
 
+# Configure basic logging for the backend
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 
 # -------------------------------------------------------
@@ -92,11 +96,16 @@ def normalize_language_name(name: str) -> str:
 
 def safe_gemini_call(prompt, model_name="gemini-flash-latest"):
     try:
-        model = genai.GenerativeModel(model_name)
-        resp = model.generate_content(prompt)
+        logging.info(f"Calling Gemini model '{model_name}'...")
+        resp = gemini_client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+        )
+        logging.info("Gemini call successful.")
         return resp.text.strip()
 
     except Exception as e:
+        logging.error(f"Gemini API Error while using {model_name}: {str(e)}")
         return f"__API_ERROR__::{str(e)}"
 
 

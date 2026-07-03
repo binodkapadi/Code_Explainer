@@ -69,7 +69,7 @@ Get Gemini API Key from: https://aistudio.google.com/app/apikey
 
 ### Step 3: Run the Streamlit Application
 
-### Before Running 
+#### Before Running 
 
 The virtual environment is activated only for the current terminal session. If you close VS Code or open a new terminal later, you must activate the virtual environment again before running the project.(By Running Below Command).
 
